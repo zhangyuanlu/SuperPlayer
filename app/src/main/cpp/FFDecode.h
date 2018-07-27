@@ -13,8 +13,11 @@ struct AVCodecContext;
 struct AVFrame;
 class FFDecode :public IDecode{
 public:
+    //初始化硬解码
+    static void InitDXVA(void *vm);
+
     //打开解码器
-    virtual bool Open(XParameter xParameter);
+    virtual bool Open(XParameter xParameter,bool isDXVA=false);
 
     //future模型，发送数据到线程解码
     virtual bool SendPacket(XData xData);

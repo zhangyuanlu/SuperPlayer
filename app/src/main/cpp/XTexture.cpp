@@ -7,30 +7,45 @@
 #include "XEGL.h"
 #include "XShader.h"
 
-class CXTexture:public XTexture{
+class CXTexture:public XTexture
+{
 public:
-    XShader xShader;
-    virtual bool Init(void *window)
+    XShader sh;
+    XTextureType type;
+
+    virtual bool Init(void *win,XTextureType type)
     {
-        if(!window)
+        this->type = type;
+        if(!win)
         {
-            XLOGE("XTexture Init failed: window is null");
+            XLOGE("XTexture Init failed win is NULL");
             return false;
         }
-        if(!XEGL::Get()->Init(window)) return false;
-        xShader.Init();
+        if(!XEGL::Get()->Init(win))return false;
+        sh.Init((XShaderType)type);
         return true;
     }
     virtual void Draw(unsigned char *data[],int width,int height)
     {
-        xShader.GetTexture(0,width,height,data[0]);         //Y
-        xShader.GetTexture(1,width/2,height/2,data[1]);     //U
-        xShader.GetTexture(2,width/2,height/2,data[2]);     //V
-        xShader.Draw();
+
+        sh.GetTexture(0,width,height,data[0]);  // Y
+
+        if(type == XTEXTURE_YUV420P)
+        {
+            sh.GetTexture(1,width/2,height/2,data[1]);  // U
+            sh.GetTexture(2,width/2,height/2,data[2]);  // V
+        }
+        else
+        {
+            sh.GetTexture(1,width/2,height/2,data[1], true);  // UV
+        }
+        sh.Draw();
         XEGL::Get()->Draw();
     }
+
 };
-XTexture* XTexture::Create()
+
+XTexture *XTexture::Create()
 {
-    return new CXTexture();
+    return  new CXTexture();
 }
