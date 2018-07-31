@@ -102,6 +102,7 @@ XData FFDecode::RecvFrame()
         d.size = av_get_bytes_per_sample((AVSampleFormat)frame->format)*frame->nb_samples*2;
     }
     d.format=frame->format;
+    d.pts=frame->pts;
     //XLOGI("d.format=%d",d.format);
     memcpy(d.datas,frame->data,sizeof(d.datas));
 

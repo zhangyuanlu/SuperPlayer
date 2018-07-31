@@ -13,6 +13,7 @@ struct XData {
     int type=0;
     unsigned char *data=0;
     unsigned char *datas[8]={0};
+    long long int pts=0;//用于统一音视频的pts单位
     int size=0;
     int width=0;
     int height=0;

@@ -94,6 +94,11 @@ XParameter FFDemux::GetAParam()
     para.sample_rate = formatContext->streams[re]->codecpar->sample_rate;
     return para;
 }
+//分数转为浮点数
+static double r2d(AVRational r)
+{
+    return r.num==0||r.den==0?0:(double)r.num/(double)r.den;
+}
 //读取一帧数据，数据由调用者清理
 XData FFDemux::Read()
 {
@@ -122,6 +127,9 @@ XData FFDemux::Read()
         av_packet_free(&pkt);
         return XData();
     }
-
+    //转换pts
+    pkt->pts=pkt->pts*(1000*r2d(formatContext->streams[pkt->stream_index]->time_base));
+    pkt->dts=pkt->dts*(1000*r2d(formatContext->streams[pkt->stream_index]->time_base));
+    d.pts=(long long int)pkt->pts;
     return d;
 }

@@ -6,6 +6,7 @@
 #define SUPERPLAYER_IPLAYER_H
 
 
+#include <mutex>
 #include "XThread.h"
 #include "XParameter.h"
 
@@ -34,6 +35,9 @@ public:
 
 protected:
     IPlayer(){};
+    //用作音视频同步
+    void Main();
+    std::mutex mut;
 };
 
 

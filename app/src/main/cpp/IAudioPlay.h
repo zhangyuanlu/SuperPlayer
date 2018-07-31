@@ -23,6 +23,8 @@ public:
     //最大缓冲
     int maxFrame=100;
 
+    long long int pts=0;
+
 protected:
     std::list <XData> frames;
     std::mutex framesMutex;

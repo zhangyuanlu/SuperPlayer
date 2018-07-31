@@ -22,6 +22,8 @@ XData IAudioPlay::GetData()
         framesMutex.unlock();
         XSleep(1);
     }
+    //未获取数据
+    pts=d.pts;
     return d;
 }
 void IAudioPlay::Update(XData data)
