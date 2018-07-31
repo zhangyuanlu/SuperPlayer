@@ -11,11 +11,12 @@ void XSleep(int mis)
     chrono::milliseconds du(mis);
     this_thread::sleep_for(du);
 }
-void XThread::Start()
+bool XThread::Start()
 {
     isExit=false;
     thread th(&XThread::ThreadMain,this);
     th.detach();    //放弃对新创建的该线程的控制
+    return true;
 }
 void XThread::ThreadMain()
 {

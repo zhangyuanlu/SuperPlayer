@@ -15,6 +15,7 @@ public:
     {
         if(eglDisplay==EGL_NO_DISPLAY||eglSurface==EGL_NO_SURFACE)
         {
+            XLOGE("EGL_NO_DISPLAY OR EGL_NO_SURFACE");
             return;
         }
         eglSwapBuffers(eglDisplay,eglSurface);

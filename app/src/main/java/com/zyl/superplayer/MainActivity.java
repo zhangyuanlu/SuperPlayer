@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             if(!mPermissionList.isEmpty()){
                 ActivityCompat.requestPermissions(this,permissions,mRequestCode);
             }else{
-                stringFromJNI();
+
             }
         }
     }
@@ -115,10 +115,4 @@ public class MainActivity extends AppCompatActivity {
     private void cancelPermissionDialog(){
         mPermissionDialog.cancel();
     }
-
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
 }

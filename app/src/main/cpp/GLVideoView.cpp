@@ -4,6 +4,7 @@
 
 #include "GLVideoView.h"
 #include "XTexture.h"
+
 void GLVideoView::SetRender(void *win)
 {
     windowView = win;

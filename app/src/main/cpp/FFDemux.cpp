@@ -15,10 +15,10 @@ FFDemux::FFDemux()
     if(isFirst)
     {
         isFirst= false;
-        //注册所有的解封装器，当前版本不需要
-    //    av_register_all();
-        //注册所有的解码器，当前版本不需要
-    //    avcodec_register_all();
+        //注册所有的解封装器，4.0之后版本不需要
+        av_register_all();
+        //注册所有的解码器，4.0之后版本不需要
+        avcodec_register_all();
         //初始化网络
         avformat_network_init();
         XLOGI("register ffmpeg");
