@@ -14,10 +14,12 @@ class GLVideoView :public IVideoView{
 public:
     virtual void SetRender(void *window);
     virtual void Render(XData xData);
+    virtual void Close();
 
 protected:
     void *windowView=0;
     XTexture *xTexture=0;
+    std::mutex mux;
 };
 
 

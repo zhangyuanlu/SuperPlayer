@@ -11,6 +11,7 @@
 class SLAudioPlay : public IAudioPlay{
 public:
     virtual bool StartPlay(XParameter out);
+    virtual void Close();
     void PlayCall(void *bufQueue);
 
     SLAudioPlay();
@@ -18,6 +19,7 @@ public:
 
 protected:
     unsigned char *buff=0;
+    std::mutex mux;
 };
 
 

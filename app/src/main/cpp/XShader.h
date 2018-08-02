@@ -6,6 +6,7 @@
 #define SUPERPLAYER_XSHADER_H
 
 #include <libavutil/pixfmt.h>
+#include <mutex>
 
 enum XShaderType
 {
@@ -17,6 +18,7 @@ enum XShaderType
 class XShader {
 public:
     virtual bool Init(XShaderType type=XShader_YUV420P);
+    virtual void Close();
     //获取材质并映射到内存
     virtual void GetTexture(unsigned int index,int width,int height, unsigned char *buf,bool isa=false);
     virtual void Draw();
@@ -26,6 +28,7 @@ protected:
     unsigned int fShader=0;
     unsigned int program=0;
     unsigned int textures[100]={0};
+    std::mutex mux;
 };
 
 

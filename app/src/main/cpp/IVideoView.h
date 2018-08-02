@@ -14,6 +14,7 @@ public:
     virtual void SetRender(void *window)=0;
     virtual void Render(XData xData)=0;
     virtual void Update(XData xData);
+    virtual void Close()=0;
 };
 
 

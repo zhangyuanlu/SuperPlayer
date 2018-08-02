@@ -19,6 +19,7 @@ public:
     }
     void Init(void *vm=0);
     virtual bool Open(const char *path);
+    virtual void Close();
     virtual bool StartPlay();
     virtual void InitView(void *window);
 

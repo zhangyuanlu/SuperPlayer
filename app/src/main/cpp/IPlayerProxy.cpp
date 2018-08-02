@@ -18,6 +18,15 @@ void IPlayerProxy::Init(void *vm)
     }
     mux.unlock();
 }
+void IPlayerProxy::Close()
+{
+    mux.lock();
+    if(player)
+    {
+        player->Close();
+    }
+    mux.unlock();
+}
 bool IPlayerProxy::Open(const char *path)
 {
     bool re=false;

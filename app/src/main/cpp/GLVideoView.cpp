@@ -9,6 +9,16 @@ void GLVideoView::SetRender(void *win)
 {
     windowView = win;
 }
+void GLVideoView::Close()
+{
+    mux.lock();
+    if(xTexture)
+    {
+        xTexture->Drop();
+        xTexture=0;
+    }
+    mux.unlock();
+}
 void GLVideoView::Render(XData data)
 {
 
