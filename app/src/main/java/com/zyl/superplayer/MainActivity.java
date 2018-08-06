@@ -13,13 +13,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.SeekBar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener,Runnable{
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private List<String> mPermissionList=new ArrayList<>();
     private final int mRequestCode=100;
     private AlertDialog mPermissionDialog;
+    private SeekBar seekBar;
+    private Button bt_play,bt_prev,bt_next;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
         setContentView(R.layout.activity_main);
-
+        initView();
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             for(int i=0;i<permissions.length;i++){
                 if(ContextCompat.checkSelfPermission(this,permissions[i])!=PackageManager.PERMISSION_GRANTED){
@@ -56,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    private void initView() {
+        seekBar=findViewById(R.id.seekBar);
+        bt_play=findViewById(R.id.bt_play);
+        bt_prev=findViewById(R.id.bt_pre);
+        bt_next=findViewById(R.id.bt_next);
+        bt_play.setOnClickListener(this);
+        bt_prev.setOnClickListener(this);
+        bt_next.setOnClickListener(this);
+        seekBar.setMax(1000);
+        seekBar.setOnSeekBarChangeListener(this);
+        new Thread(this).start();
     }
 
     @Override
@@ -115,4 +132,71 @@ public class MainActivity extends AppCompatActivity {
     private void cancelPermissionDialog(){
         mPermissionDialog.cancel();
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.bt_play:{
+                playOrPause();
+                break;
+            }
+            case R.id.bt_pre:{
+
+                break;
+            }
+            case R.id.bt_next:{
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void run() {
+        while (true){
+            seekBar.setProgress((int)(getPlayPos()*1000));
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(!isPausing()){
+            playOrPause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+     //   closePlayer();
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        seekPlayPos((double) seekBar.getProgress()/(double)seekBar.getMax());
+    }
+
+    public native double getPlayPos();
+    public native void seekPlayPos(double pos);
+    public native void playOrPause();
+    public native void closePlayer();
+    public native boolean isPausing();
 }

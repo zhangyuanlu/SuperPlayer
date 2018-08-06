@@ -22,6 +22,10 @@ public:
     virtual void Close();
     virtual bool StartPlay();
     virtual void InitView(void *window);
+    virtual double PlayPos();
+    virtual bool SeekPos(double pos);
+    virtual void SetPause(bool isPause);
+    virtual bool IsPause();
 
 protected:
     IPlayerProxy(){}

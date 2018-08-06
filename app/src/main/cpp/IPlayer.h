@@ -24,6 +24,10 @@ public:
     virtual void Close();
     virtual bool StartPlay();
     virtual void InitView(void *window);
+    //获取当前的播放进度（0.0~1.0）
+    virtual double PlayPos();
+    virtual bool SeekPos(double pos);
+    virtual void SetPause(bool isPause);
 
     bool isDXVA= true;
     IDemux *iDemux=0;

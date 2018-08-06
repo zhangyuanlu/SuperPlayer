@@ -14,7 +14,6 @@ class IDecode :public IObserver{
 public:
     //打开解码器
     virtual bool Open(XParameter xParameter,bool isDXVA=false)=0;
-
     virtual void Close()=0;
     virtual void Clear();
 

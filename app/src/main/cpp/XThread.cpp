@@ -14,6 +14,7 @@ void XSleep(int mis)
 bool XThread::Start()
 {
     isExit=false;
+    isPause= false;
     thread th(&XThread::ThreadMain,this);
     th.detach();    //放弃对新创建的该线程的控制
     return true;
@@ -41,4 +42,17 @@ void XThread::Stop()
         XSleep(1);
     }
     XLOGI("停止线程超时");
+}
+void XThread::SetPause(bool isPause)
+{
+    this->isPause=isPause;
+    //等待100ms
+    for(int i=0;i<10;i++)
+    {
+        if(isPausing==isPause)
+        {
+            break;
+        }
+        XSleep(10);
+    }
 }

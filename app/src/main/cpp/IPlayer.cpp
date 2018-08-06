@@ -36,6 +36,10 @@ void IPlayer::Close()
     {
         aDecode->Stop();
     }
+    if(iAudioPlay)
+    {
+        iAudioPlay->Stop();
+    }
     //清理缓冲队列
     if(vDecode)
     {
@@ -73,6 +77,115 @@ void IPlayer::Close()
 
     mut.unlock();
 }
+double IPlayer::PlayPos()
+{
+    double pos=0.0;
+    mut.lock();
+    int total=0;
+    if(iDemux)
+    {
+        total=iDemux->totalMs;
+    }
+    if(total>0)
+    {
+        if(vDecode)
+        {
+            pos=(double)vDecode->pts/(double)total;
+        }
+    }
+    mut.unlock();
+    return pos;
+}
+bool IPlayer::SeekPos(double pos)
+{
+    if(!iDemux)
+    {
+        return false;
+    }
+    bool ret=false;
+    //暂停所有线程
+    SetPause(true);
+    mut.lock();
+    //清理缓冲
+    if(vDecode)
+    {
+        vDecode->Clear();
+    }
+    if(aDecode)
+    {
+        aDecode->Clear();
+    }
+    if(iAudioPlay)
+    {
+        iAudioPlay->Clear();
+    }
+    ret=iDemux->Seek(pos);  //seek跳转到关键帧
+    //解码到实际需要显示的帧
+    if(!vDecode)
+    {
+        mut.unlock();
+        SetPause(false);
+        return ret;
+    }
+    int seekPts=pos*iDemux->totalMs;
+    while (!isExit)
+    {
+        XData pkt=iDemux->Read();
+        if(pkt.size<=0)
+        {
+            break;
+        }
+        if(pkt.isAudio)
+        {
+            if(pkt.pts<seekPts)
+            {
+                pkt.Drop();
+                continue;
+            }
+            //写入缓冲队列
+            iDemux->Notify(pkt);
+            continue;
+        }
+        //解码需要显示的帧之前的数据
+        vDecode->SendPacket(pkt);
+        pkt.Drop();
+        XData data=vDecode->RecvFrame();
+        if(data.size<=0)
+        {
+            continue;
+        }
+        if(data.pts>=seekPts)
+        {
+            //vDecode->Notify(pkt);
+            break;
+        }
+    }
+    mut.unlock();
+    SetPause(false);
+    return ret;
+}
+void IPlayer::SetPause(bool isPause)
+{
+    mut.lock();
+    XThread::SetPause(isPause);
+    if(iDemux)
+    {
+        iDemux->SetPause(isPause);
+    }
+    if(vDecode)
+    {
+        vDecode->SetPause(isPause);
+    }
+    if(aDecode)
+    {
+        aDecode->SetPause(isPause);
+    }
+    if(iAudioPlay)
+    {
+        iAudioPlay->SetPause(isPause);
+    }
+    mut.unlock();
+}
 bool IPlayer::Open(const char *path)
 {
     Close();
@@ -93,10 +206,10 @@ bool IPlayer::Open(const char *path)
         XLOGE("ADecode Open %s Failed",path);
         //return false;
     }
-    if(outPara.sample_rate<=0)
-    {
+    //if(outPara.sample_rate<=0)
+    //{
         outPara=iDemux->GetAParam();
-    }
+    //}
     if(!iResample||!iResample->Open(iDemux->GetAParam(),outPara))
     {
         XLOGE("IResample Open %s Failed",path);
@@ -130,8 +243,10 @@ bool IPlayer::StartPlay()
 }
 void IPlayer::InitView(void *window)
 {
-    if(iVideoView)
+    if(iVideoView){
+        iVideoView->Close();
         iVideoView->SetRender(window);
+    }
 }
 
 void IPlayer::Main()

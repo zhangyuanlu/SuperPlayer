@@ -50,12 +50,6 @@ static void PcmCall(SLAndroidSimpleBufferQueueItf bufferQueueItf,void *context)
 }
 void SLAudioPlay::PlayCall(void *bufQueue)
 {
-    if(!bufQueue)
-    {
-        return;
-    }
-    SLAndroidSimpleBufferQueueItf bufferQueueItf=(SLAndroidSimpleBufferQueueItf)bufQueue;
-  //  XLOGI("SLAudioPlay::PlayCall success");
     //阻塞
     XData xData=GetData();
     if(xData.size<=0)
@@ -69,7 +63,8 @@ void SLAudioPlay::PlayCall(void *bufQueue)
     }
     memcpy(buff,xData.data,xData.size);
     mux.lock();
-    (*bufferQueueItf)->Enqueue(bufferQueueItf,buff,xData.size);
+    if(pcmQueue&&(*pcmQueue))
+        (*pcmQueue)->Enqueue(pcmQueue,buff,xData.size);
     mux.unlock();
     xData.Drop();
 }
@@ -102,6 +97,12 @@ void SLAudioPlay::Close()
     {
         (*slObjectItf)->Destroy(slObjectItf);
     }
+    slObjectItf=NULL;
+    slEngineItf=NULL;
+    objectMix=NULL;
+    player=NULL;
+    playItf=NULL;
+    pcmQueue=NULL;
     mux.unlock();
 }
 bool SLAudioPlay::StartPlay(XParameter out)
@@ -203,6 +204,7 @@ bool SLAudioPlay::StartPlay(XParameter out)
 
     //启动队列回调
     (*pcmQueue)->Enqueue(pcmQueue,"",1);
+    isExit= false;
     XLOGI("audio play StartPlay success");
     mux.unlock();
     return true;

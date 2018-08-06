@@ -28,6 +28,16 @@ void FFDecode::Close()
     }
     mux.unlock();
 }
+void FFDecode::Clear()
+{
+    IDecode::Clear();
+    mux.lock();
+    if(codecContext)
+    {
+        avcodec_flush_buffers(codecContext);
+    }
+    mux.unlock();
+}
 bool FFDecode::Open(XParameter para,bool isDXVA)
 {
     Close();

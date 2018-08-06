@@ -15,7 +15,7 @@ public:
 
     //打开文件或者流媒体rmtp http rtsp
     virtual bool Open(const char *url);
-
+    virtual bool Seek(double pos);
     virtual void Close();
 
     //获取视频参数

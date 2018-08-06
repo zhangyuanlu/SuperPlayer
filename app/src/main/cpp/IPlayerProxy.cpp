@@ -27,12 +27,55 @@ void IPlayerProxy::Close()
     }
     mux.unlock();
 }
+double IPlayerProxy::PlayPos()
+{
+    double pos=0.0;
+    mux.lock();
+    if(player)
+    {
+        pos=player->PlayPos();
+    }
+    mux.unlock();
+    return pos;
+}
+bool IPlayerProxy::SeekPos(double pos)
+{
+    bool ret=false;
+    mux.lock();
+    if(player)
+    {
+        ret=player->SeekPos(pos);
+    }
+    mux.unlock();
+    return ret;
+}
+bool IPlayerProxy::IsPause()
+{
+    bool ret=false;
+    mux.lock();
+    if(player)
+    {
+        ret=player->IsPause();
+    }
+    mux.unlock();
+    return ret;
+}
+void IPlayerProxy::SetPause(bool isPause)
+{
+    mux.lock();
+    if(player)
+    {
+        player->SetPause(isPause);
+    }
+    mux.unlock();
+}
 bool IPlayerProxy::Open(const char *path)
 {
     bool re=false;
     mux.lock();
     if(player)
     {
+        player->isDXVA=isDXVA;
         re=player->Open(path);
     }
     mux.unlock();

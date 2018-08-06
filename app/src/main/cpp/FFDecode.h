@@ -19,6 +19,7 @@ public:
     //打开解码器
     virtual bool Open(XParameter xParameter,bool isDXVA=false);
     virtual void Close();
+    virtual void Clear();
 
     //future模型，发送数据到线程解码
     virtual bool SendPacket(XData xData);

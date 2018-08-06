@@ -34,7 +34,25 @@ void FFDemux::Close()
     }
     mux.unlock();
 }
-
+bool FFDemux::Seek(double pos)
+{
+    bool ret=false;
+    mux.lock();
+    if(pos>=0&&pos<=1)
+    {
+        if(formatContext)
+        {
+            //清理掉缓存
+            avformat_flush(formatContext);
+            long long seekPts=0;
+            seekPts=formatContext->streams[videoStream]->duration*pos;
+            //向后跳转后关键帧
+            ret=av_seek_frame(formatContext,videoStream,seekPts,AVSEEK_FLAG_FRAME|AVSEEK_FLAG_BACKWARD);
+        }
+    }
+    mux.unlock();
+    return ret;
+}
 //打开文件，或者流媒体 rmtp http rtsp
 bool FFDemux::Open(const char *url)
 {
@@ -136,8 +154,8 @@ XData FFDemux::Read()
     int re = av_read_frame(formatContext,pkt);
     if(re != 0)
     {
-        av_packet_free(&pkt);
         mux.unlock();
+        av_packet_free(&pkt);
         return XData();
     }
     //XLOGI("pack size is %d ptss %lld",pkt->size,pkt->pts);
@@ -153,8 +171,8 @@ XData FFDemux::Read()
     }
     else
     {
-        av_packet_free(&pkt);
         mux.unlock();
+        av_packet_free(&pkt);
         return XData();
     }
     //转换pts

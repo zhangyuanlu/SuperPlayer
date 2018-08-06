@@ -27,10 +27,35 @@ Java_com_zyl_superplayer_XPlayView_initView(JNIEnv *env, jobject instance, jobje
 
     // TODO
     ANativeWindow *aNativeWindow=ANativeWindow_fromSurface(env,surface);
-  //  if(player)
-  //      player->InitView(aNativeWindow);
     IPlayerProxy::Get()->InitView(aNativeWindow);
-  //  XEGL::Get()->Init(aNativeWindow);
-  //  XShader shader;
-  //  shader.Init();
+}extern "C"
+JNIEXPORT jdouble JNICALL
+Java_com_zyl_superplayer_MainActivity_getPlayPos(JNIEnv *env, jobject instance) {
+
+    // TODO
+    return IPlayerProxy::Get()->PlayPos();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_zyl_superplayer_MainActivity_seekPlayPos(JNIEnv *env, jobject instance, jdouble pos) {
+
+    // TODO
+   IPlayerProxy::Get()->SeekPos(pos);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_zyl_superplayer_MainActivity_playOrPause(JNIEnv *env, jobject instance) {
+
+    // TODO
+    IPlayerProxy::Get()->SetPause(!IPlayerProxy::Get()->IsPause());
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_zyl_superplayer_MainActivity_closePlayer(JNIEnv *env, jobject instance) {
+
+    // TODO
+    IPlayerProxy::Get()->Close();
+}extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_zyl_superplayer_MainActivity_isPausing(JNIEnv *env, jobject instance) {
+
+    // TODO
+    return IPlayerProxy::Get()->IsPause();
 }
