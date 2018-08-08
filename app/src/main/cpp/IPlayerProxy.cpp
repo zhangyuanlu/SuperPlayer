@@ -4,6 +4,7 @@
 
 #include "IPlayerProxy.h"
 #include "FFPlayerBuilder.h"
+#include "XLog.h"
 
 void IPlayerProxy::Init(void *vm)
 {
@@ -100,4 +101,15 @@ void IPlayerProxy::InitView(void *window)
         player->InitView(window);
     }
     mux.unlock();
+}
+int IPlayerProxy::GetTotalMs()
+{
+    int re=0;
+    mux.lock();
+    if(player)
+    {
+        re=player->GetTotalMs();
+    }
+    mux.unlock();
+    return re;
 }

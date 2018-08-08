@@ -77,6 +77,17 @@ void IPlayer::Close()
 
     mut.unlock();
 }
+int IPlayer::GetTotalMs()
+{
+    int ms=0;
+    mut.lock();
+    if(iDemux)
+    {
+        ms=iDemux->totalMs;
+    }
+    mut.unlock();
+    return ms;
+}
 double IPlayer::PlayPos()
 {
     double pos=0.0;

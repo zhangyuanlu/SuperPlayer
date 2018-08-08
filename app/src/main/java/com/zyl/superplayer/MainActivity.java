@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -13,13 +15,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,SeekBar.OnSeekBarChangeListener,Runnable{
 
@@ -27,13 +32,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static {
         System.loadLibrary("native-lib");
     }
-
+    private static final int SHOW_MENU=1;
+    private static final int UPDATE_TIME=2;
     private String[] permissions={Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private List<String> mPermissionList=new ArrayList<>();
     private final int mRequestCode=100;
     private AlertDialog mPermissionDialog;
     private SeekBar seekBar;
     private Button bt_play,bt_prev,bt_next;
+    private TextView tv_time_pass,tv_time_total;
+    private FrameLayout frameLayout;
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what==UPDATE_TIME) {
+                String time=(String)msg.obj;
+                tv_time_pass.setText(time);
+            }else if(msg.what==SHOW_MENU){
+                hideBottomView();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +86,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bt_play=findViewById(R.id.bt_play);
         bt_prev=findViewById(R.id.bt_pre);
         bt_next=findViewById(R.id.bt_next);
+        tv_time_pass=findViewById(R.id.time_pass);
+        tv_time_total=findViewById(R.id.time_total);
+        frameLayout=findViewById(R.id.layout_frame);
         bt_play.setOnClickListener(this);
         bt_prev.setOnClickListener(this);
         bt_next.setOnClickListener(this);
+        frameLayout.setOnClickListener(this);
         seekBar.setMax(1000);
         seekBar.setOnSeekBarChangeListener(this);
+        tv_time_total.setText(getTMs(getTotalMs()));
+        showBottomView();
         new Thread(this).start();
     }
 
@@ -137,15 +162,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.bt_play:{
+                showBottomView();
                 playOrPause();
+                if(isPausing()){
+                    bt_play.setBackground(getDrawable(R.drawable.ic_pause_black_15dp));
+                }else{
+                    bt_play.setBackground(getDrawable(R.drawable.ic_play_arrow_black_15dp));
+                }
                 break;
             }
             case R.id.bt_pre:{
-
+                showBottomView();
                 break;
             }
             case R.id.bt_next:{
-
+                showBottomView();
+                break;
+            }
+            case R.id.layout_frame:{
+                showBottomView();
                 break;
             }
             default:
@@ -153,12 +188,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void showBottomView(){
+        handler.removeCallbacks(sendMsgToHandler);
+        bt_prev.setVisibility(View.VISIBLE);
+        bt_next.setVisibility(View.VISIBLE);
+        bt_play.setVisibility(View.VISIBLE);
+        handler.postDelayed(sendMsgToHandler,3000);
+    }
+    private void hideBottomView(){
+        bt_prev.setVisibility(View.INVISIBLE);
+        bt_next.setVisibility(View.INVISIBLE);
+        bt_play.setVisibility(View.INVISIBLE);
+    }
+    private Runnable sendMsgToHandler=new Runnable() {
+        @Override
+        public void run() {
+            Message message=Message.obtain();
+            message.what=SHOW_MENU;
+            handler.sendMessage(message);
+        }
+    };
     @Override
     public void run() {
         while (true){
-            seekBar.setProgress((int)(getPlayPos()*1000));
+            double ms=getPlayPos();
+            seekBar.setProgress((int)(ms*1000));
             try {
-                Thread.sleep(40);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -176,12 +232,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-     //   closePlayer();
+        System.exit(0);
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+        double time=(double) getTotalMs()*progress/(double) seekBar.getMax();
+        Message message=Message.obtain();
+        message.what=UPDATE_TIME;
+        message.obj=getTMs(time);
+        handler.sendMessage(message);
     }
 
     @Override
@@ -193,10 +253,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onStopTrackingTouch(SeekBar seekBar) {
         seekPlayPos((double) seekBar.getProgress()/(double)seekBar.getMax());
     }
-
+    private String getTMs(double ms){
+        SimpleDateFormat formatter;
+        if(ms<60*1000*60){
+            formatter= new SimpleDateFormat("mm:ss");
+        }else{
+            formatter= new SimpleDateFormat("HH:mm:ss");
+        }
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+        return formatter.format(ms);
+    }
     public native double getPlayPos();
     public native void seekPlayPos(double pos);
     public native void playOrPause();
-    public native void closePlayer();
     public native boolean isPausing();
+    public native int getTotalMs();
 }

@@ -3,6 +3,7 @@ package com.zyl.superplayer;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
@@ -32,7 +33,7 @@ public class XPlayView extends GLSurfaceView implements SurfaceHolder.Callback,G
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        closePlayer();
     }
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -55,4 +56,5 @@ public class XPlayView extends GLSurfaceView implements SurfaceHolder.Callback,G
      * @param holder
      */
     public native void initView(Surface surface);
+    public native void closePlayer();
 }

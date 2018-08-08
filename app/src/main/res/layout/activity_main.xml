@@ -10,27 +10,48 @@
         android:layout_height="match_parent" />
 
     <FrameLayout
+        android:id="@+id/layout_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
         <RelativeLayout
+            android:id="@+id/layout_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
+            <TextView
+                android:id="@+id/time_pass"
+                android:singleLine="true"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:gravity="center"
+                android:text="00:00:00"/>
 
             <SeekBar
                 android:id="@+id/seekBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="60dp"
+                android:layout_marginEnd="60dp"/>
+            <TextView
+                android:id="@+id/time_total"
+                android:singleLine="true"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:gravity="center"
+                android:text="00:00:00"/>
             <Button
                 android:id="@+id/bt_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/seekBar"
                 android:layout_centerHorizontal="true"
-                android:text="play"/>
+                android:background="@drawable/ic_play_arrow_black_15dp"/>
 
             <Button
                 android:id="@+id/bt_pre"
@@ -38,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/seekBar"
                 android:layout_toStartOf="@+id/bt_play"
-                android:text="prev"/>
+                android:background="@drawable/ic_skip_previous_black_15dp"/>
 
             <Button
                 android:id="@+id/bt_next"
@@ -46,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/seekBar"
                 android:layout_toEndOf="@+id/bt_play"
-                android:text="next"/>
+                android:background="@drawable/ic_skip_next_black_15dp"/>
         </RelativeLayout>
     </FrameLayout>
 

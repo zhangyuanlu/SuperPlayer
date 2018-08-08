@@ -3,6 +3,8 @@
 #include "android/native_window_jni.h"
 #include "FFPlayerBuilder.h"
 #include "IPlayerProxy.h"
+#include "IDemux.h"
+
 static IPlayer *player=NULL;
 extern "C"
 JNIEXPORT
@@ -47,15 +49,21 @@ Java_com_zyl_superplayer_MainActivity_playOrPause(JNIEnv *env, jobject instance)
     // TODO
     IPlayerProxy::Get()->SetPause(!IPlayerProxy::Get()->IsPause());
 }extern "C"
-JNIEXPORT void JNICALL
-Java_com_zyl_superplayer_MainActivity_closePlayer(JNIEnv *env, jobject instance) {
-
-    // TODO
-    IPlayerProxy::Get()->Close();
-}extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_zyl_superplayer_MainActivity_isPausing(JNIEnv *env, jobject instance) {
 
     // TODO
     return IPlayerProxy::Get()->IsPause();
+}extern "C"
+JNIEXPORT void JNICALL
+Java_com_zyl_superplayer_XPlayView_closePlayer(JNIEnv *env, jobject instance) {
+
+    // TODO
+    IPlayerProxy::Get()->Close();
+}extern "C"
+JNIEXPORT jint JNICALL
+Java_com_zyl_superplayer_MainActivity_getTotalMs(JNIEnv *env, jobject instance) {
+
+    // TODO
+    return IPlayerProxy::Get()->GetTotalMs();
 }
